@@ -1,12 +1,12 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
-title: "My Research Software"
+title: "Role of Parameter Uncertainty Metrics in Case of a Solenoid Design Problem "
 authors:
-  - family-names: Druskat
-    given-names: Stephan
-    orcid: https://orcid.org/1234-5678-9101-1121
-version: 2.0.4
-date-released: 2021-08-11
-doi: 10.5281/zenodo.1234
-license: Apache-2.0
-repository-code: "https://github.com/citation-file-format/my-research-software"
+  - family-names: Orosz
+    given-names: Tamás
+    orcid: https://orcid.org/0000-0002-8743-3989
+version: 0.0.1
+date-released: 2024-08-11
+doi: ...
+license: MIT
+repository-code: +https://github.com/tamasorosz/TEAM35-DOE"
