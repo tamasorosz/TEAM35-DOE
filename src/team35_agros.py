@@ -1,85 +1,84 @@
-# import Agros Suite
 from agrossuite import agros
-#from agrossuite.vtk_tools import view_geometry, view_scalar
 
-import matplotlib.pylab as pl
+# constants
+WIDTH = 1.2*1e-3
+HEIGHT = 1.8*1e-3
+CURRENT_DENSITY = 2.0
 
 
-# problem
-problem = agros.problem(clear = True)
-problem.coordinate_type = "axisymmetric"
-problem.mesh_type = "triangle"
+def create_solenoid(radiis: list, geo, z_min=0.0):
+    """This function draws the geometry and handles the uncertainties which can happen """
+    for index, radii in enumerate(radiis):
+        # draw the horizontal edges
+        # case 1: create a single edge for the top line
+        if index < 1 or (radii - radiis[index - 1] < 1e-7):
+            geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii + WIDTH, (index + 1) * HEIGHT + z_min,
+                         boundaries=None)
+        # case 2: intersecting edges
+        elif abs(radii - radiis[index - 1]) < WIDTH:
 
-# parameters
-problem.parameters["I"] = 10
-problem.parameters["a"] = 0.002
-problem.parameters["h"] = 0.01
-problem.parameters["w"] = 0.005
+            x1 = radii
+            x2 = x1 + WIDTH
+            x3 = radiis[index - 1]
+            x4 = x3 + WIDTH
 
-# fields
-# magnetic
-magnetic = problem.field("magnetic")
-magnetic.analysis_type = "steadystate"
-magnetic.matrix_solver = "external_plugin"
-magnetic.number_of_refinements = 1
-magnetic.polynomial_order = 2
-magnetic.adaptivity_type = "disabled"
-magnetic.solver = "linear"
+            sorted_x = sorted([x1, x2, x3, x4])
 
-# boundaries
-magnetic.add_boundary("A = 0", "magnetic_potential", {"magnetic_potential_real" : 0})
+            geo.add_edge(sorted_x[0], (index + 1) * HEIGHT + z_min, sorted_x[1], (index + 1) * HEIGHT + z_min,
+                         boundaries=None)
+            geo.add_edge(sorted_x[1], (index + 1) * HEIGHT + z_min, sorted_x[2], (index + 1) * HEIGHT + z_min,
+                         boundaries=None)
+            geo.add_edge(sorted_x[2], (index + 1) * HEIGHT + z_min, sorted_x[3], (index + 1) * HEIGHT + z_min,
+                         boundaries=None)
+        else:
+            # normal case
+            geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii + WIDTH, (index + 1) * HEIGHT + z_min,
+                         boundaries=None)
+            geo.add_edge(radiis[index - 1], (index + 1) * HEIGHT + z_min, radiis[index - 1] + WIDTH,
+                         (index + 1) * HEIGHT + z_min, boundaries=None)
 
-# materials
-magnetic.add_material("Coil", {"magnetic_conductivity" : 0, "magnetic_current_density_external_real" : "I/(w*h)", "magnetic_permeability" : 1, "magnetic_remanence" : 0, "magnetic_remanence_angle" : 0, "magnetic_velocity_angular" : 0, "magnetic_velocity_x" : 0, "magnetic_velocity_y" : 0})
-magnetic.add_material("Air", {"magnetic_conductivity" : 0, "magnetic_current_density_external_real" : 0, "magnetic_permeability" : 1, "magnetic_remanence" : 0, "magnetic_remanence_angle" : 0, "magnetic_velocity_angular" : 0, "magnetic_velocity_x" : 0, "magnetic_velocity_y" : 0})
-magnetic.add_material("Iron", {"magnetic_conductivity" : 0, "magnetic_current_density_external_real" : 0, "magnetic_permeability" : 500, "magnetic_remanence" : 0, "magnetic_remanence_angle" : 0, "magnetic_velocity_angular" : 0, "magnetic_velocity_x" : 0, "magnetic_velocity_y" : 0})
+        # adds the bottom line
+        if index == (len(radii) - 1):
+            geo.add_edge(radii, z_min, radii + WIDTH, z_min, boundaries=None)
 
-# geometry
-geometry = problem.geometry()
-geometry.add_edge(0, 0.025, 0, -0.003, boundaries = {"magnetic" : "A = 0"})
-geometry.add_edge(0, 0.025, 0.03, 0.025, boundaries = {"magnetic" : "A = 0"})
-geometry.add_edge(0.03, 0.025, 0.03, -0.025, boundaries = {"magnetic" : "A = 0"})
-geometry.add_edge(0.03, -0.025, 0, -0.025, boundaries = {"magnetic" : "A = 0"})
-geometry.add_edge(0.001, -0.01, 0, -0.01)
-geometry.add_edge(0, -0.003, 0, -0.01, boundaries = {"magnetic" : "A = 0"})
-geometry.add_edge(0, -0.003, 0.001, -0.003)
-geometry.add_edge(0.001, -0.003, 0.001, -0.01)
-geometry.add_edge("a", "-h/2", "a+w", "-h/2")
-geometry.add_edge("a+w", "h/2", "a+w", "-h/2")
-geometry.add_edge("a", "h/2", "a", "-h/2")
-geometry.add_edge("a", "h/2", "a+w", "h/2")
-geometry.add_edge(0, -0.01, 0, -0.025, boundaries = {"magnetic" : "A = 0"})
+        # vertical lines
+        geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii, index * HEIGHT + z_min, boundaries=None)
+        geo.add_edge(radii + WIDTH, (index + 1) * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min,
+                     boundaries=None)
 
-geometry.add_label("a+w/2", 0, materials = {"magnetic" : "Coil"})
-geometry.add_label(0.0225658, 0.00334431, materials = {"magnetic" : "Air"})
-geometry.add_label(0.000593115, -0.00823363, materials = {"magnetic" : "Iron"})
+    return
 
-# recipes
-magnetic.add_recipe_volume_integral("F", "magnetic_tensor_force_y", [2], -1, -1)
 
-# studies
-study_nlopt = problem.add_study("nlopt")
-study_nlopt.add_parameter("w", 0.002, 0.01)
-study_nlopt.add_parameter("h", 0.004, 0.02)
-study_nlopt.add_parameter("I", 2, 20)
-study_nlopt.add_functional("Fmax", "-F", 100)
-study_nlopt.clear_solution = True
-study_nlopt.solve_problem = True
-study_nlopt.settings["xtol_rel"] = 1e-06
-study_nlopt.settings["xtol_abs"] = 1e-12
-study_nlopt.settings["ftol_rel"] = 1e-06
-study_nlopt.settings["ftol_abs"] = 1e-12
-study_nlopt.settings["n_iterations"] = 50
-study_nlopt.settings["algorithm"] = "ln_bobyqa"
+def fem_model(radii: list):
+    team_problem = agros.problem(clear=True)
+    team_problem.geometry()
+    team_problem.coordinate_type = "axisymmetric"
+    team_problem.mesh_type = "triangle"
 
-# computation
-study_nlopt.solve()
+    # setting the solver
+    magnetic = team_problem.field("magnetic")
+    magnetic.analysis_type = "steadystate"
+    magnetic.number_of_refinements = 1
+    magnetic.polynomial_order = 2
+    magnetic.adaptivity_type = "disabled"
+    magnetic.solver = "linear"
 
-of_max = study_nlopt.values("Fmax")
+    # boundary condition at the outer edges of the example
+    magnetic.add_boundary("A = 0", "magnetic_potential", {"magnetic_potential_real": 0})
 
-n = pl.linspace(1, len(of_max), len(of_max))
-
-pl.scatter(n, of_max)
-pl.xlabel("steps (-)")
-pl.ylabel("OF max (N)")
-pl.grid(True)
+    # defining tge air and the material for the copper
+    magnetic.add_material(
+        "Air",
+        {
+            "magnetic_permeability": 1,
+            "magnetic_conductivity": 0,
+            "magnetic_remanence": 0,
+            "magnetic_remanence_angle": 0,
+            "magnetic_velocity_x": 0,
+            "magnetic_velocity_y": 0,
+            "magnetic_velocity_angular": 0,
+            "magnetic_current_density_external_real": 0,
+            "magnetic_total_current_prescribed": 0,
+            "magnetic_total_current_real": 0,
+        },
+    )
