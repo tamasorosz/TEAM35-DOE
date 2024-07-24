@@ -1,12 +1,12 @@
 from agrossuite import agros
 
 # constants
-WIDTH = 1.2*1e-3
-HEIGHT = 1.8*1e-3
+WIDTH = 1.2 * 1e-3
+HEIGHT = 1.8 * 1e-3
 CURRENT_DENSITY = 2.0
 
 
-def create_solenoid(radiis: list, geo, z_min=0.0):
+def create_solenoid(radiis: list, geo, magnetic, z_min=0.0):
     """This function draws the geometry and handles the uncertainties which can happen """
     for index, radii in enumerate(radiis):
         # draw the horizontal edges
@@ -45,6 +45,20 @@ def create_solenoid(radiis: list, geo, z_min=0.0):
         geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii, index * HEIGHT + z_min, boundaries=None)
         geo.add_edge(radii + WIDTH, (index + 1) * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min,
                      boundaries=None)
+
+        magnetic.add_material(
+            f"turn_{index}",
+            {
+                "magnetic_permeability": 1,
+                "magnetic_conductivity": 57 * 1e6,
+                "magnetic_remanence": 0,
+                "magnetic_remanence_angle": 0,
+                "magnetic_velocity_x": 0,
+                "magnetic_velocity_y": 0,
+                "magnetic_velocity_angular": 0,
+                "magnetic_current_density_external_real": CURRENT_DENSITY * 1e6,
+            })
+        geo.add_label(radii + WIDTH, (index + 0.5) * HEIGHT + z_min, materials={f"magnetic": "turn_{index}"})
 
     return
 
