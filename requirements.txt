@@ -1,2 +1,3 @@
 agrossuite===2020.9.15.64726
 scipy
+scikit-learn
