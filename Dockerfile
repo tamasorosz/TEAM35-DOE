@@ -15,11 +15,13 @@ RUN apt-get update && \
     libmumps-seq-5.2.1 \
     libmetis5 \
     liblapack3 \
+    libcurl4-gnutls-dev \
     gcc \
     g++ \
     curl && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
 
 
 # Install specific version of Python
@@ -29,3 +31,11 @@ RUN apt-get update && \
     apt-get update &&\
     apt-get install -y python${PYTHON_VERSION} python3-pip && \
     rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+WORKDIR /app
+COPY src /app
+
+ENTRYPOINT ["python3.8", "team35_agros.py"]
