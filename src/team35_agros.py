@@ -67,7 +67,7 @@ def create_solenoid(radiis: list, geo, magnetic, z_min=0.0):
     return
 
 
-def fem_model(radii: list):
+def fem_model(radiis: list):
     team_problem = agros.problem(clear=True)
     geo = team_problem.geometry()
     team_problem.coordinate_type = "axisymmetric"
@@ -90,7 +90,6 @@ def fem_model(radii: list):
     geo.add_edge(WIN_W, WIN_MIN + WIN_H, 0.0, WIN_MIN + WIN_H, boundaries={"magnetic": "A = 0"})
     geo.add_edge(0.0, WIN_MIN + WIN_H, 0, WIN_MIN, boundaries={"magnetic": "A = 0"})
 
-
     # defining tge air and the material for the copper
     magnetic.add_material(
         "Air",
@@ -108,4 +107,14 @@ def fem_model(radii: list):
         },
     )
 
-    geo.add_label(WIN_W-1e-3, WIN_H-1e-3, materials={"magnetic": "Air"})
+    geo.add_label(WIN_W - 1e-3, WIN_H - 1e-3, materials={"magnetic": "Air"})
+
+    create_solenoid(radiis, geo, magnetic, z_min=0.0)
+
+    computation = team_problem.computation()
+    computation.solve()
+    solution = computation.solution("magnetic")
+
+
+if __name__ == '__main__':
+    fem_model(radiis=[13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5])
