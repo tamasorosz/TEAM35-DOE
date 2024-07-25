@@ -58,7 +58,7 @@ def create_solenoid(radiis: list, geo, magnetic, z_min=0.0):
                 "magnetic_velocity_angular": 0,
                 "magnetic_current_density_external_real": CURRENT_DENSITY * 1e6,
             })
-        geo.add_label(radii + WIDTH, (index + 0.5) * HEIGHT + z_min, materials={f"magnetic": "turn_{index}"})
+        geo.add_label(radii + 0.5 * WIDTH, (index + 0.5) * HEIGHT + z_min, materials={f"magnetic": "turn_{index}"})
 
     return
 
