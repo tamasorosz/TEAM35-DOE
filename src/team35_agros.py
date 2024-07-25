@@ -1,9 +1,13 @@
 from agrossuite import agros
 
 # constants
-WIDTH = 1.2 * 1e-3
-HEIGHT = 1.8 * 1e-3
-CURRENT_DENSITY = 2.0
+WIDTH = 1.0 * 1e-3
+HEIGHT = 1.5 * 1e-3
+CURRENT_DENSITY = 3.0
+
+WIN_W = 40. * 1e-3  # solution area width
+WIN_H = 25. * 1e-3  # solution area height
+WIN_MIN = 0.  # minimum position for the solution window
 
 
 def create_solenoid(radiis: list, geo, magnetic, z_min=0.0):
@@ -65,7 +69,7 @@ def create_solenoid(radiis: list, geo, magnetic, z_min=0.0):
 
 def fem_model(radii: list):
     team_problem = agros.problem(clear=True)
-    team_problem.geometry()
+    geo = team_problem.geometry()
     team_problem.coordinate_type = "axisymmetric"
     team_problem.mesh_type = "triangle"
 
@@ -79,6 +83,13 @@ def fem_model(radii: list):
 
     # boundary condition at the outer edges of the example
     magnetic.add_boundary("A = 0", "magnetic_potential", {"magnetic_potential_real": 0})
+
+    # outer rectangle
+    geo.add_edge(0.0, WIN_MIN, WIN_W, WIN_MIN, boundaries={"magnetic": "A = 0"})
+    geo.add_edge(WIN_W, WIN_MIN, WIN_W, WIN_MIN + WIN_H, boundaries={"magnetic": "A = 0"})
+    geo.add_edge(WIN_W, WIN_MIN + WIN_H, 0.0, WIN_MIN + WIN_H, boundaries={"magnetic": "A = 0"})
+    geo.add_edge(0.0, WIN_MIN + WIN_H, 0, WIN_MIN, boundaries={"magnetic": "A = 0"})
+
 
     # defining tge air and the material for the copper
     magnetic.add_material(
@@ -96,3 +107,5 @@ def fem_model(radii: list):
             "magnetic_total_current_real": 0,
         },
     )
+
+    geo.add_label(WIN_W-1e-3, WIN_H-1e-3, materials={"magnetic": "Air"})
