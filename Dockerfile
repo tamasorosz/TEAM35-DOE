@@ -18,18 +18,24 @@ RUN apt-get update && \
     libcurl4-gnutls-dev \
     gcc \
     g++ \
-    curl && \
+    curl  \
+    xvfb \
+    libx11-dev \
+    libxrender-dev \
+    libgl1-mesa-glx \
+    libxt6 \
+    mesa-utils \
+    libgl1-mesa-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-
-
+RUN Xvfb :99 -screen 0 1024x768x16 & export DISPLAY=:99
 # Install specific version of Python
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt-get update &&\
-    apt-get install -y python${PYTHON_VERSION} python3-pip && \
+    apt-get install -y python${PYTHON_VERSION} python3-pip python3-matplotlib && \
     rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
@@ -37,5 +43,9 @@ RUN pip install -r requirements.txt
 
 WORKDIR /app
 COPY src /app
+
+RUN Xvfb :99 -screen 0 1024x768x24 & export DISPLAY=:99
+VOLUME ["/app/output"]
+#ENTRYPOINT ["python3.8", "heat_problem.py"]
 
 ENTRYPOINT ["python3.8", "team35_agros.py"]

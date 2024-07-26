@@ -1,0 +1,11 @@
+services:
+  app:
+    build: .
+    privileged: true
+    environment:
+      - DISPLAY=${DISPLAY}  # Ensure this resolves correctly on your host
+      - XDG_RUNTIME_DIR=/tmp/runtime-root
+
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix  # Mount the X11 socket
+    restart: no
