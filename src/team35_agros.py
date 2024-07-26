@@ -30,22 +30,21 @@ def create_solenoid(radiis: list, geo, magnetic, z_min=0.0):
                 geo.add_edge(sorted_x[2], (index + 1) * HEIGHT + z_min, sorted_x[3], (index + 1) * HEIGHT + z_min,
                              boundaries=None)
 
+                if abs(radii - radiis[index - 1]) >WIDTH:
+                    print(radii)
+                    geo.add_edge(radii, (index) * HEIGHT + z_min, radii + WIDTH, (index) * HEIGHT + z_min,
+                            boundaries=None)
 
             else:
                 geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii + WIDTH, (index + 1) * HEIGHT + z_min,
                              boundaries=None)
                 if abs(radii - radiis[index - 1]) > WIDTH:
-                    print(index, radii)
                     geo.add_edge(radii, (index) * HEIGHT + z_min, radii + WIDTH, (index) * HEIGHT + z_min,
                              boundaries=None)
 
         else:
             geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii + WIDTH, (index + 1) * HEIGHT + z_min,
                          boundaries=None)
-
-        if index == 0:
-            geo.add_edge(radii, z_min, radii + WIDTH,  z_min, boundaries=None)
-
 
         # vertical lines
         geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii, index * HEIGHT + z_min, boundaries=None)
