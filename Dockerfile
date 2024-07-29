@@ -44,8 +44,7 @@ RUN pip install -r requirements.txt
 WORKDIR /app
 COPY src /app
 
-RUN Xvfb :99 -screen 0 1024x768x24 & export DISPLAY=:99
 VOLUME ["/app/output"]
-#ENTRYPOINT ["python3.8", "heat_problem.py"]
+#ENTRYPOINT ["python3.8", "test_transformer_fem_model.py"]
 
 ENTRYPOINT ["python3.8", "team35_agros.py"]

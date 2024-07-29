@@ -4,3 +4,6 @@ scikit-learn
 vtk
 matplotlib
 opencv-python
+typer
+marshmallow-dataclass
+dataclasses-json
