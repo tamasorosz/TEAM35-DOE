@@ -48,6 +48,7 @@ class FemModel:
                 "magnetic_total_current_real": 0,
             },
         )
+
     def create_rectangle(self, x0: float, y0: float, width: float, height: float, boundary: dict = None):
         """
         A rectangle class to define the windings and the working window of the transformer.
@@ -105,14 +106,14 @@ class FemModel:
             if index < len(radiis) - 1:
 
                 distance = abs(radii - radiis[index + 1])
-                if distance<=WIDTH+1e-6:
+                if distance <= WIDTH + 1e-6:
                     x1 = radii
                     x2 = x1 + WIDTH
                     x3 = radiis[index + 1]
                     x4 = x3 + WIDTH
 
                     sorted_x = sorted([x1, x2, x3, x4])
-                    print("indexes:",index, radii)
+                    print("indexes:", index, radii)
                     self.geo.add_edge(sorted_x[0], (index + 1) * HEIGHT + z_min, sorted_x[1],
                                       (index + 1) * HEIGHT + z_min)
                     self.geo.add_edge(sorted_x[1], (index + 1) * HEIGHT + z_min, sorted_x[2],
@@ -121,13 +122,13 @@ class FemModel:
                                       (index + 1) * HEIGHT + z_min)
 
                     if abs(radii - radiis[index - 1]) - WIDTH > 1e-6:
-                       self.geo.add_edge(radii, index * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
+                        self.geo.add_edge(radii, index * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
 
                 else:
                     # this branch handles those cases when the turn edges not connects with each other
                     # top edge
 
-                    #if abs(radii - radiis[index + 1]) - WIDTH > 1e-6:
+                    # if abs(radii - radiis[index + 1]) - WIDTH > 1e-6:
                     self.geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii + WIDTH, (index + 1) * HEIGHT + z_min)
                     if abs(radii - radiis[index - 1]) - WIDTH > 1e-6:
                         self.geo.add_edge(radii, index * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
@@ -160,13 +161,12 @@ class FemModel:
 
 if __name__ == '__main__':
     simulation = FemModel()
-    #simulation.fem_simulation(
-    #radiis = [13.5 * 1e-3, 12.5 * 1e-3, 10.5 * 1e-3, 6.5 * 1e-3, 8.5 * 1e-3, 7.5 * 1e-3, 6.5 * 1e-3, 6.5 * 1e-3,
-    #          6.5 * 1e-3, 6.5 * 1e-3])
-    simulation.fem_simulation(
-        radiis=[0.0135, 0.0125, 0.0105, 0.0065, 0.0085, 0.0075, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065,
-                0.0065, 0.0075, 0.0085])
+    x_1 = [13.5 * 1e-3, 12.5 * 1e-3, 10.5 * 1e-3, 6.5 * 1e-3, 8.5 * 1e-3, 7.5 * 1e-3, 6.5 * 1e-3, 6.5 * 1e-3,
+           6.5 * 1e-3, 6.5 * 1e-3]
 
-    #         0.0065, 0.0065, 0.0065, 0.0065,
-    # 0.0075, 0.0085, 0.0065,
-    # 0.0105, 0.0125, 0.0135])
+    x_2 = [0.0135, 0.0125, 0.0105, 0.0065, 0.0085, 0.0075, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065,
+           0.0065, 0.0075, 0.0085, 0.0065, 0.0105, 0.0125, 0.0135]
+
+    x_3 = [6.5e-3, 6.5e-3, 6.5e-3, 6.5e-3, 7.5e-3, 8.5e-3, 6.5e-3, 10.5e-3, 12.5e-3, 13.5e-3, 13.5e-3, 12.5e-3, 10.5e-3,
+           6.5e-3, 8.5e-3, 7.5e-3, 6.5e-3, 6.5e-3, 6.5e-3, 6.5e-3]
+    simulation.fem_simulation(radiis=x_3)
