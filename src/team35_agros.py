@@ -113,7 +113,6 @@ class FemModel:
                     x4 = x3 + WIDTH
 
                     sorted_x = sorted([x1, x2, x3, x4])
-                    print("indexes:", index, radii)
                     self.geo.add_edge(sorted_x[0], (index + 1) * HEIGHT + z_min, sorted_x[1],
                                       (index + 1) * HEIGHT + z_min)
                     self.geo.add_edge(sorted_x[1], (index + 1) * HEIGHT + z_min, sorted_x[2],
@@ -121,21 +120,23 @@ class FemModel:
                     self.geo.add_edge(sorted_x[2], (index + 1) * HEIGHT + z_min, sorted_x[3],
                                       (index + 1) * HEIGHT + z_min)
 
-                    if abs(radii - radiis[index - 1]) - WIDTH > 1e-6:
+                    if abs(radii - radiis[index - 1]) - WIDTH > 1e-6 or index == 0:
                         self.geo.add_edge(radii, index * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
 
                 else:
+
                     # this branch handles those cases when the turn edges not connects with each other
                     # top edge
-
-                    # if abs(radii - radiis[index + 1]) - WIDTH > 1e-6:
                     self.geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii + WIDTH, (index + 1) * HEIGHT + z_min)
+
                     if abs(radii - radiis[index - 1]) - WIDTH > 1e-6:
                         self.geo.add_edge(radii, index * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
 
             else:
                 # very top line in the case of the first turn
                 self.geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii + WIDTH, (index + 1) * HEIGHT + z_min)
+                if abs(radii - radiis[index - 1]) - WIDTH > 1e-6:
+                    self.geo.add_edge(radii, index * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
 
             # vertical lines
             self.geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii, index * HEIGHT + z_min)
@@ -167,6 +168,23 @@ if __name__ == '__main__':
     x_2 = [0.0135, 0.0125, 0.0105, 0.0065, 0.0085, 0.0075, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065,
            0.0065, 0.0075, 0.0085, 0.0065, 0.0105, 0.0125, 0.0135]
 
+    # previous paper
     x_3 = [6.5e-3, 6.5e-3, 6.5e-3, 6.5e-3, 7.5e-3, 8.5e-3, 6.5e-3, 10.5e-3, 12.5e-3, 13.5e-3, 13.5e-3, 12.5e-3, 10.5e-3,
            6.5e-3, 8.5e-3, 7.5e-3, 6.5e-3, 6.5e-3, 6.5e-3, 6.5e-3]
-    simulation.fem_simulation(radiis=x_3)
+
+    # test 1
+    x_4 = [0.0123, 0.0197, 0.0165, 0.0078, 0.0110, 0.0139, 0.0181, 0.0094,
+           0.0156, 0.0224, 0.0168, 0.0081, 0.0072, 0.0170, 0.0133, 0.0185,
+           0.0079, 0.0193, 0.0129, 0.0146]
+
+    # test 2
+    x_5 = [0.0172, 0.0076, 0.0150, 0.0089, 0.0191, 0.0064, 0.0135, 0.0182,
+           0.0149, 0.0097, 0.0164, 0.0112, 0.0200, 0.0121, 0.0189, 0.0176,
+           0.0158, 0.0195, 0.0068, 0.0118]
+
+    # test 3
+    x_6 = [0.0067, 0.0199, 0.0111, 0.0091, 0.0142, 0.0161, 0.0068, 0.0200,
+           0.0153, 0.0074, 0.0192, 0.0114, 0.0177, 0.0124, 0.0061, 0.0145,
+           0.0155, 0.0071, 0.0086, 0.0160]
+
+    simulation.fem_simulation(radiis=x_6)
