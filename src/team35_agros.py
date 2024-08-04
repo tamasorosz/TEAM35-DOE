@@ -1,5 +1,6 @@
 from agrossuite import agros
 from vtk_tools import show_geometry
+from metrics import f1_score, f2_robustness
 
 # constants
 WIDTH = 1.0 * 1e-3
@@ -9,6 +10,14 @@ CURRENT_DENSITY = 3.0
 WINDOW_W = 40.0  # solution area width
 WINDOW_H = 50.0  # solution area height
 WINDOW_MIN = -25.0  # minimum position for the solution window
+
+WIDTH_A = 5.0  # width of the control region
+HEIGHT_A = 5.0  # height of the control region
+
+NX = 10
+NY = 20
+
+B_0 = 2.0 * 1e-3  # 2 mT is the aimed flux density
 
 
 class FemModel:
@@ -96,9 +105,22 @@ class FemModel:
 
         computation = simulation.problem.computation()
         computation.solve()
+
         solution = computation.solution("magnetic")
 
+        # the magnetic field values collected in the rectangle [(0,5),(-5, -5)]
+        b_values = []
+        for i in range(NX):
+            for j in range(NY):
+                x = i * 5.0 * WIDTH_A
+                y = j * 5.0 * HEIGHT_A
+                point = solution.local_values(x, y)
+                b_values.append(point['Br'])
+
+        f1 = f1_score(b_values, b_0=B_0)
         print('Magnetic Energy', solution.volume_integrals()["Wm"])
+        print('The calculated value of the f1 score is:', f1)
+        return f1
 
     def create_solenoid(self, radiis: list, z_min=0.0):
         """This function draws the geometry and handles the uncertainties which can happen """
