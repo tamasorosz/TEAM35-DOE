@@ -97,66 +97,6 @@ class FemModel:
 
         return x0 + width / 2.0, y0 + height / 2.0  # gives back the center of the rectangle in [m]-s
 
-    def create_solenoid(self, radiis: list, z_min=0.0):
-        """This function draws the geometry and handles the uncertainties which can happen """
-        for index, radii in enumerate(radiis):
-            if index < len(radiis) - 1:
-
-                distance = abs(radii - radiis[index + 1])
-                if distance <= WIDTH + 1e-6:
-                    x1 = radii
-                    x2 = x1 + WIDTH
-                    x3 = radiis[index + 1]
-                    x4 = x3 + WIDTH
-
-                    sorted_x = sorted([x1, x2, x3, x4])
-                    self.geo.add_edge(sorted_x[0], (index + 1) * HEIGHT + z_min, sorted_x[1],
-                                      (index + 1) * HEIGHT + z_min)
-                    self.geo.add_edge(sorted_x[1], (index + 1) * HEIGHT + z_min, sorted_x[2],
-                                      (index + 1) * HEIGHT + z_min)
-                    self.geo.add_edge(sorted_x[2], (index + 1) * HEIGHT + z_min, sorted_x[3],
-                                      (index + 1) * HEIGHT + z_min)
-
-                    if abs(radii - radiis[index - 1]) - WIDTH > 1e-6 or index == 0:
-                        self.geo.add_edge(radii, index * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
-
-                else:
-
-                    # this branch handles those cases when the turn edges not connects with each other
-                    # top edge
-                    self.geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii + WIDTH, (index + 1) * HEIGHT + z_min)
-
-                    if abs(radii - radiis[index - 1]) - WIDTH > 1e-6:
-                        self.geo.add_edge(radii, index * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
-
-            else:
-                # very top line in the case of the first turn
-                self.geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii + WIDTH, (index + 1) * HEIGHT + z_min)
-                if abs(radii - radiis[index - 1]) - WIDTH > 1e-6:
-                    self.geo.add_edge(radii, index * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
-
-            # vertical lines
-            print(radii, (index + 1) * HEIGHT + z_min)
-            self.geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii, index * HEIGHT + z_min)
-            self.geo.add_edge(radii + WIDTH, (index + 1) * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
-
-            turn_material = f"turn_{index}"
-            self.magnetic.add_material(
-                turn_material,
-                {
-                    "magnetic_permeability": 1,
-                    "magnetic_conductivity": 57 * 1e6,
-                    "magnetic_remanence": 0,
-                    "magnetic_remanence_angle": 0,
-                    "magnetic_velocity_x": 0,
-                    "magnetic_velocity_y": 0,
-                    "magnetic_velocity_angular": 0,
-                    "magnetic_current_density_external_real": CURRENT_DENSITY * 1e6,
-                })
-            self.geo.add_label(radii + 0.5 * WIDTH, (index + 0.5) * HEIGHT + z_min,
-                               materials={"magnetic": turn_material})
-        return
-
 
 def fem_simulation(radiis):
     simulation = FemModel()
