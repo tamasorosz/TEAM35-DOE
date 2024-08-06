@@ -24,9 +24,10 @@ B_0 = 2.0 * 1e-3  # 2 mT is the aimed flux density
 class FemModel:
     """The goal of this class is to build a basic 2d axisymmetric model for transformer simulation in Agros Suite"""
 
-    def __init__(self, radiis: list):
+    def __init__(self, radiis: list, current_density: list):
 
         self.radiis = radiis
+        self.current_density = current_density
         self.problem = agros.problem(clear=True)
         self.geo = self.problem.geometry()
 
@@ -117,7 +118,7 @@ class FemModel:
                     "magnetic_velocity_x": 0,
                     "magnetic_velocity_y": 0,
                     "magnetic_velocity_angular": 0,
-                    "magnetic_current_density_external_real": CURRENT_DENSITY * 1e6,
+                    "magnetic_current_density_external_real": self.current_density[index] * 1e6,
                 })
 
             self.create_rectangle(radii, index * HEIGHT + z_min + (index - 1) * INSULATION_HEIGHT, WIDTH, HEIGHT)
@@ -144,17 +145,19 @@ class FemModel:
                 else:
                     y = j * HEIGHT_A / NY * 1e-3
                 point = solution.local_values(x, y)
-                print(x, y, point)
+                #print(x, y, point)
                 b_values.append(point["Br"])
 
         f1 = f1_score(b_values, b_0=B_0)
-        print('Magnetic Energy', solution.volume_integrals()["Wm"])
+        print('Magnetic Energy', solution.volume_integrals())
         print('The calculated value of the f1 score is: [mT]', f1 * 1e3)
         return f1
 
 
 if __name__ == '__main__':
     x_1 = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5]
+
+    current_density_2 = [3.5 for i in range(20)]
 
     x_2 = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 7.5, 8.5, 6.5, 10.5, 12.5, 13.5]
 
@@ -174,5 +177,5 @@ if __name__ == '__main__':
     x_6 = [6.7, 19.9, 11.1, 9.1, 14.2, 16.1, 6.8, 20.0, 15.3, 7.4, 19.2, 11.4, 17.7, 12.4, 6.1, 14.5, 15.5, 7.1, 8.6,
            16.0]
 
-    simulation = FemModel(radiis=x_2)
+    simulation = FemModel(radiis=x_2, current_density=current_density_2)
     simulation.fem_simulation()
