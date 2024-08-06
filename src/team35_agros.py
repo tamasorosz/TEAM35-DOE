@@ -1,5 +1,5 @@
 from agrossuite import agros
-from vtk_tools import show_geometry, figure
+from vtk_tools import show_geometry, show, figure
 from metrics import f1_score, f2_robustness
 
 # constants
@@ -145,12 +145,13 @@ class FemModel:
                 else:
                     y = j * HEIGHT_A / NY * 1e-3
                 point = solution.local_values(x, y)
-                #print(x, y, point)
                 b_values.append(point["Br"])
 
         f1 = f1_score(b_values, b_0=B_0)
         print('Magnetic Energy', solution.volume_integrals())
         print('The calculated value of the f1 score is: [mT]', f1 * 1e3)
+        show(self.problem, computation, field="magnetic", variable="magnetic_potential", component="r")
+
         return f1
 
 

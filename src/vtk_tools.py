@@ -434,7 +434,7 @@ def show(problem, computation, field, variable, component, time_step=0, adaptive
     temp_post_name = "{}.vtk".format(next(tempfile._get_candidate_names()))
     solution = computation.solution(field)
     solution.export_vtk(temp_post_name, time_step, adaptive_step, variable, component)
-
+    print(temp_post_name)
     scalar = scalar_actor(temp_post_name)
     contours = contours_actor(temp_post_name)
 
