@@ -24,8 +24,9 @@ B_0 = 2.0 * 1e-3  # 2 mT is the aimed flux density
 class FemModel:
     """The goal of this class is to build a basic 2d axisymmetric model for transformer simulation in Agros Suite"""
 
-    def __init__(self):
+    def __init__(self, radiis: list):
 
+        self.radiis = radiis
         self.problem = agros.problem(clear=True)
         self.geo = self.problem.geometry()
 
@@ -97,60 +98,59 @@ class FemModel:
 
         return x0 + width / 2.0, y0 + height / 2.0  # gives back the center of the rectangle in [m]-s
 
+    def fem_simulation(self):
+        # simulation = FemModel()
+        self.create_rectangle(0.0, WINDOW_MIN, WINDOW_W, WINDOW_H, {"magnetic": "A = 0"})
+        self.geo.add_label(1e-3, (WINDOW_MIN + 1.0) * 1e-3, materials={"magnetic": "Air"})
 
-def fem_simulation(radiis):
-    simulation = FemModel()
-    simulation.create_rectangle(0.0, WINDOW_MIN, WINDOW_W, WINDOW_H, {"magnetic": "A = 0"})
-    simulation.geo.add_label(1e-3, (WINDOW_MIN + 1.0) * 1e-3, materials={"magnetic": "Air"})
+        # self.create_solenoid(radiis=radiis, z_min=-len(radiis) / 2. * HEIGHT)
+        z_min = -len(self.radiis) / 2. * HEIGHT
+        for index, radii in enumerate(self.radiis):
+            turn_material = f"turn_{index}"
+            self.magnetic.add_material(
+                turn_material,
+                {
+                    "magnetic_permeability": 1,
+                    "magnetic_conductivity": 57 * 1e6,
+                    "magnetic_remanence": 0,
+                    "magnetic_remanence_angle": 0,
+                    "magnetic_velocity_x": 0,
+                    "magnetic_velocity_y": 0,
+                    "magnetic_velocity_angular": 0,
+                    "magnetic_current_density_external_real": CURRENT_DENSITY * 1e6,
+                })
 
-    # simulation.create_solenoid(radiis=radiis, z_min=-len(radiis) / 2. * HEIGHT)
-    z_min = -len(radiis) / 2. * HEIGHT
-    for index, radii in enumerate(radiis):
-        turn_material = f"turn_{index}"
-        simulation.magnetic.add_material(
-            turn_material,
-            {
-                "magnetic_permeability": 1,
-                "magnetic_conductivity": 57 * 1e6,
-                "magnetic_remanence": 0,
-                "magnetic_remanence_angle": 0,
-                "magnetic_velocity_x": 0,
-                "magnetic_velocity_y": 0,
-                "magnetic_velocity_angular": 0,
-                "magnetic_current_density_external_real": CURRENT_DENSITY * 1e6,
-            })
+            self.create_rectangle(radii, index * HEIGHT + z_min + (index - 1) * INSULATION_HEIGHT, WIDTH, HEIGHT)
+            self.geo.add_label((radii + 0.5 * HEIGHT) * 1e-3,
+                               (index * HEIGHT + z_min + 0.5 * HEIGHT + (index - 1) * INSULATION_HEIGHT) * 1e-3,
+                               materials={"magnetic": turn_material})
+        show_geometry(self.problem)
 
-        simulation.create_rectangle(radii, index * HEIGHT + z_min + (index - 1) * INSULATION_HEIGHT, WIDTH, HEIGHT)
-        simulation.geo.add_label((radii + 0.5 * HEIGHT) * 1e-3,
-                                 (index * HEIGHT + z_min + 0.5 * HEIGHT + (index - 1) * INSULATION_HEIGHT) * 1e-3,
-                                 materials={"magnetic": turn_material})
-    show_geometry(simulation.problem)
+        computation = self.problem.computation()
+        computation.solve()
 
-    computation = simulation.problem.computation()
-    computation.solve()
+        solution = computation.solution("magnetic")
 
-    solution = computation.solution("magnetic")
+        # the magnetic field values collected in the rectangle [(0,5),(-5, -5)]
+        b_values = []
+        for i in range(NX + 1):
+            for j in range(NY + 1):
+                if i == 0:
+                    x = 1e-3
+                else:
+                    x = i * WIDTH_A / NX * 1e-3
+                if j == 0:
+                    y = 1e-3
+                else:
+                    y = j * HEIGHT_A / NY * 1e-3
+                point = solution.local_values(x, y)
+                print(x, y, point)
+                b_values.append(point["Br"])
 
-    # the magnetic field values collected in the rectangle [(0,5),(-5, -5)]
-    b_values = []
-    for i in range(NX + 1):
-        for j in range(NY + 1):
-            if i == 0:
-                x = 1e-3
-            else:
-                x = i * WIDTH_A / NX * 1e-3
-            if j == 0:
-                y = 1e-3
-            else:
-                y = j * HEIGHT_A / NY * 1e-3
-            point = solution.local_values(x, y)
-            print(x, y, point)
-            b_values.append(point["Br"])
-
-    f1 = f1_score(b_values, b_0=B_0)
-    print('Magnetic Energy', solution.volume_integrals()["Wm"])
-    print('The calculated value of the f1 score is:', f1)
-    return f1
+        f1 = f1_score(b_values, b_0=B_0)
+        print('Magnetic Energy', solution.volume_integrals()["Wm"])
+        print('The calculated value of the f1 score is: [mT]', f1 * 1e3)
+        return f1
 
 
 if __name__ == '__main__':
@@ -174,4 +174,5 @@ if __name__ == '__main__':
     x_6 = [6.7, 19.9, 11.1, 9.1, 14.2, 16.1, 6.8, 20.0, 15.3, 7.4, 19.2, 11.4, 17.7, 12.4, 6.1, 14.5, 15.5, 7.1, 8.6,
            16.0]
 
-    fem_simulation(radiis=x_2)
+    simulation = FemModel(radiis=x_2)
+    simulation.fem_simulation()
