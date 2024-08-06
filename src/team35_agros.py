@@ -1,10 +1,12 @@
 from agrossuite import agros
-from vtk_tools import show_geometry
+from vtk_tools import show_geometry, figure
 from metrics import f1_score, f2_robustness
 
 # constants
-WIDTH = 1.0 * 1e-3
-HEIGHT = 1.5 * 1e-3
+WIDTH = 1.0
+HEIGHT = 1.5
+INSULATION_HEIGHT = 0.06
+
 CURRENT_DENSITY = 3.0
 
 WINDOW_W = 40.0  # solution area width
@@ -13,7 +15,6 @@ WINDOW_MIN = -25.0  # minimum position for the solution window
 
 WIDTH_A = 5.0  # width of the control region
 HEIGHT_A = 5.0  # height of the control region
-
 NX = 10
 NY = 20
 
@@ -30,6 +31,7 @@ class FemModel:
 
         self.problem.coordinate_type = "axisymmetric"
         self.problem.mesh_type = "triangle"
+        self.problem.frequency = 50
 
         self.magnetic = self.problem.field("magnetic")
         self.magnetic.analysis_type = "steadystate"
@@ -95,33 +97,6 @@ class FemModel:
 
         return x0 + width / 2.0, y0 + height / 2.0  # gives back the center of the rectangle in [m]-s
 
-    def fem_simulation(self, radiis, detailed_output=True):
-
-        self.create_rectangle(0.0, WINDOW_MIN, WINDOW_W, WINDOW_H, {"magnetic": "A = 0"})
-        self.geo.add_label(1e-3, (WINDOW_MIN + 1.0) * 1e-3, materials={"magnetic": "Air"})
-
-        self.create_solenoid(radiis=radiis, z_min=-len(radiis) / 2. * HEIGHT)
-        show_geometry(simulation.problem)
-
-        computation = simulation.problem.computation()
-        computation.solve()
-
-        solution = computation.solution("magnetic")
-
-        # the magnetic field values collected in the rectangle [(0,5),(-5, -5)]
-        b_values = []
-        for i in range(NX):
-            for j in range(NY):
-                x = i * 5.0 * WIDTH_A
-                y = j * 5.0 * HEIGHT_A
-                point = solution.local_values(x, y)
-                b_values.append(point['Br'])
-
-        f1 = f1_score(b_values, b_0=B_0)
-        print('Magnetic Energy', solution.volume_integrals()["Wm"])
-        print('The calculated value of the f1 score is:', f1)
-        return f1
-
     def create_solenoid(self, radiis: list, z_min=0.0):
         """This function draws the geometry and handles the uncertainties which can happen """
         for index, radii in enumerate(radiis):
@@ -161,6 +136,7 @@ class FemModel:
                     self.geo.add_edge(radii, index * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
 
             # vertical lines
+            print(radii, (index + 1) * HEIGHT + z_min)
             self.geo.add_edge(radii, (index + 1) * HEIGHT + z_min, radii, index * HEIGHT + z_min)
             self.geo.add_edge(radii + WIDTH, (index + 1) * HEIGHT + z_min, radii + WIDTH, index * HEIGHT + z_min)
 
@@ -182,31 +158,80 @@ class FemModel:
         return
 
 
-if __name__ == '__main__':
+def fem_simulation(radiis):
     simulation = FemModel()
-    x_1 = [13.5 * 1e-3, 12.5 * 1e-3, 10.5 * 1e-3, 6.5 * 1e-3, 8.5 * 1e-3, 7.5 * 1e-3, 6.5 * 1e-3, 6.5 * 1e-3,
-           6.5 * 1e-3, 6.5 * 1e-3]
+    simulation.create_rectangle(0.0, WINDOW_MIN, WINDOW_W, WINDOW_H, {"magnetic": "A = 0"})
+    simulation.geo.add_label(1e-3, (WINDOW_MIN + 1.0) * 1e-3, materials={"magnetic": "Air"})
 
-    x_2 = [0.0135, 0.0125, 0.0105, 0.0065, 0.0085, 0.0075, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065, 0.0065,
-           0.0065, 0.0075, 0.0085, 0.0065, 0.0105, 0.0125, 0.0135]
+    # simulation.create_solenoid(radiis=radiis, z_min=-len(radiis) / 2. * HEIGHT)
+    z_min = -len(radiis) / 2. * HEIGHT
+    for index, radii in enumerate(radiis):
+        turn_material = f"turn_{index}"
+        simulation.magnetic.add_material(
+            turn_material,
+            {
+                "magnetic_permeability": 1,
+                "magnetic_conductivity": 57 * 1e6,
+                "magnetic_remanence": 0,
+                "magnetic_remanence_angle": 0,
+                "magnetic_velocity_x": 0,
+                "magnetic_velocity_y": 0,
+                "magnetic_velocity_angular": 0,
+                "magnetic_current_density_external_real": CURRENT_DENSITY * 1e6,
+            })
+
+        simulation.create_rectangle(radii, index * HEIGHT + z_min + (index - 1) * INSULATION_HEIGHT, WIDTH, HEIGHT)
+        simulation.geo.add_label((radii + 0.5 * HEIGHT) * 1e-3,
+                                 (index * HEIGHT + z_min + 0.5 * HEIGHT + (index - 1) * INSULATION_HEIGHT) * 1e-3,
+                                 materials={"magnetic": turn_material})
+    show_geometry(simulation.problem)
+
+    computation = simulation.problem.computation()
+    computation.solve()
+
+    solution = computation.solution("magnetic")
+
+    # the magnetic field values collected in the rectangle [(0,5),(-5, -5)]
+    b_values = []
+    for i in range(NX + 1):
+        for j in range(NY + 1):
+            if i == 0:
+                x = 1e-3
+            else:
+                x = i * WIDTH_A / NX * 1e-3
+            if j == 0:
+                y = 1e-3
+            else:
+                y = j * HEIGHT_A / NY * 1e-3
+            point = solution.local_values(x, y)
+            print(x, y, point)
+            b_values.append(point["Br"])
+
+    f1 = f1_score(b_values, b_0=B_0)
+    print('Magnetic Energy', solution.volume_integrals()["Wm"])
+    print('The calculated value of the f1 score is:', f1)
+    return f1
+
+
+if __name__ == '__main__':
+    x_1 = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5]
+
+    x_2 = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 7.5, 8.5, 6.5, 10.5, 12.5, 13.5]
 
     # previous paper
     x_3 = [6.5e-3, 6.5e-3, 6.5e-3, 6.5e-3, 7.5e-3, 8.5e-3, 6.5e-3, 10.5e-3, 12.5e-3, 13.5e-3, 13.5e-3, 12.5e-3, 10.5e-3,
            6.5e-3, 8.5e-3, 7.5e-3, 6.5e-3, 6.5e-3, 6.5e-3, 6.5e-3]
 
     # test 1
-    x_4 = [0.0123, 0.0197, 0.0165, 0.0078, 0.0110, 0.0139, 0.0181, 0.0094,
-           0.0156, 0.0224, 0.0168, 0.0081, 0.0072, 0.0170, 0.0133, 0.0185,
-           0.0079, 0.0193, 0.0129, 0.0146]
+    x_4 = [12.3, 9.7, 16.5, 7.8, 11.0, 13.9, 18.1, 9.4, 15.6, 22.4, 16.8, 8.1, 7.2, 17.0, 13.3, 18.5, 7.9, 19.3, 12.9,
+           14.6]
 
     # test 2
-    x_5 = [0.0172, 0.0076, 0.0150, 0.0089, 0.0191, 0.0064, 0.0135, 0.0182,
-           0.0149, 0.0097, 0.0164, 0.0112, 0.0200, 0.0121, 0.0189, 0.0176,
-           0.0158, 0.0195, 0.0068, 0.0118]
+    x_5 = [17.2, 7.6, 15.0, 8.9, 19.1, 6.4, 13.5, 18.2, 14.9, 9.7, 16.4, 11.2, 20.0, 12.1, 18.9, 17.6, 15.8, 19.5, 6.8,
+           11.8]
 
     # test 3
-    x_6 = [0.0067, 0.0199, 0.0111, 0.0091, 0.0142, 0.0161, 0.0068, 0.0200,
-           0.0153, 0.0074, 0.0192, 0.0114, 0.0177, 0.0124, 0.0061, 0.0145,
-           0.0155, 0.0071, 0.0086, 0.0160]
+    x_6 = [6.7, 19.9, 11.1, 9.1, 14.2, 16.1, 6.8, 20.0, 15.3, 7.4, 19.2, 11.4, 17.7, 12.4, 6.1, 14.5, 15.5, 7.1, 8.6,
+           16.0]
 
-    simulation.fem_simulation(radiis=x_6)
+    fem_simulation(radiis=x_2)

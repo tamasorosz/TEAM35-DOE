@@ -45,6 +45,6 @@ WORKDIR /app
 COPY src /app
 
 VOLUME ["/app/output"]
-#ENTRYPOINT ["python3.8", "test_transformer_fem_model.py"]
+#ENTRYPOINT ["python3.8", "test_agros.py"]
 
 ENTRYPOINT ["python3.8", "team35_agros.py"]

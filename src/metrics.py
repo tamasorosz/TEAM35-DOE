@@ -1,4 +1,4 @@
-from sklearn.metrics import mean_squared_error, max_error, mean_absolute_error, r2_score, mean_absolute_percentage_error
+from sklearn.metrics import max_error
 from math import pi
 
 
@@ -10,7 +10,8 @@ def f1_score(b, b_0=2e-3):
 
     return max_error(b0, b)
 
-def f2_robustness(f1:list, f1_0:float):
+
+def f2_robustness(f1: list, f1_0: float):
     """
     This metric calculates the robustness of a design with the given
 
@@ -20,6 +21,7 @@ def f2_robustness(f1:list, f1_0:float):
     """
 
     return max_error(f1_0, f1)
+
 
 def f3_losses(r: list):
     """The power loss depends on the current if it can be varied."""
