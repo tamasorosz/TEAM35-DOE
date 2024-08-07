@@ -109,10 +109,10 @@ class FemModel:
         for index, radii in enumerate(self.radiis):
             turn_material = f"turn_{index}"
             self.magnetic.add_material(
-                turn_material,
+                f"turn_{index}",
                 {
                     "magnetic_permeability": 1,
-                    "magnetic_conductivity": 57 * 1e6,
+                    "magnetic_conductivity": 0,
                     "magnetic_remanence": 0,
                     "magnetic_remanence_angle": 0,
                     "magnetic_velocity_x": 0,
@@ -124,8 +124,8 @@ class FemModel:
             self.create_rectangle(radii, index * HEIGHT + z_min + (index - 1) * INSULATION_HEIGHT, WIDTH, HEIGHT)
             self.geo.add_label((radii + 0.5 * HEIGHT) * 1e-3,
                                (index * HEIGHT + z_min + 0.5 * HEIGHT + (index - 1) * INSULATION_HEIGHT) * 1e-3,
-                               materials={"magnetic": turn_material})
-        show_geometry(self.problem)
+                               materials={"magnetic": f"turn_{index}"})
+        #show_geometry(self.problem)
 
         computation = self.problem.computation()
         computation.solve()
@@ -150,7 +150,7 @@ class FemModel:
         f1 = f1_score(b_values, b_0=B_0)
         print('Magnetic Energy', solution.volume_integrals())
         print('The calculated value of the f1 score is: [mT]', f1 * 1e3)
-        show(self.problem, computation, field="magnetic", variable="magnetic_potential", component="r")
+        show(self.problem, computation, field="magnetic", variable="magnetic_potential_real", component="scalar")
 
         return f1
 
