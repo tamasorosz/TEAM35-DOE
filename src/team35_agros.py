@@ -1,11 +1,17 @@
 from agrossuite import agros
-from vtk_tools import show_geometry, show, figure
-from metrics import f1_score, f2_robustness
+from vtk_tools import show
+from metrics import f1_score
+
+"""
+The role of this module is to create a FEM model for the TEAM 35 benchmark problem from a given turn radius list,
+where in parallel the current density  can be defined separately for every turns. 
+The result of the fem calculation is the f1 metric, the max error from the prescribed magnetic field density. 
+"""
 
 # constants
 WIDTH = 1.0
 HEIGHT = 1.5
-INSULATION_HEIGHT = 0.06
+INSULATION_THICKNESS = 0.06
 
 CURRENT_DENSITY = 3.0
 
@@ -104,7 +110,6 @@ class FemModel:
         self.create_rectangle(0.0, WINDOW_MIN, WINDOW_W, WINDOW_H, {"magnetic": "A = 0"})
         self.geo.add_label(1e-3, (WINDOW_MIN + 1.0) * 1e-3, materials={"magnetic": "Air"})
 
-        # self.create_solenoid(radiis=radiis, z_min=-len(radiis) / 2. * HEIGHT)
         z_min = -len(self.radiis) / 2. * HEIGHT
         for index, radii in enumerate(self.radiis):
             turn_material = f"turn_{index}"
@@ -121,11 +126,10 @@ class FemModel:
                     "magnetic_current_density_external_real": self.current_density[index] * 1e6,
                 })
 
-            self.create_rectangle(radii, index * HEIGHT + z_min + (index - 1) * INSULATION_HEIGHT, WIDTH, HEIGHT)
+            self.create_rectangle(radii, index * HEIGHT + z_min + (index - 1) * INSULATION_THICKNESS, WIDTH, HEIGHT)
             self.geo.add_label((radii + 0.5 * HEIGHT) * 1e-3,
-                               (index * HEIGHT + z_min + 0.5 * HEIGHT + (index - 1) * INSULATION_HEIGHT) * 1e-3,
+                               (index * HEIGHT + z_min + 0.5 * HEIGHT + (index - 1) * INSULATION_THICKNESS) * 1e-3,
                                materials={"magnetic": f"turn_{index}"})
-        #show_geometry(self.problem)
 
         computation = self.problem.computation()
         computation.solve()
@@ -152,13 +156,23 @@ class FemModel:
         print('The calculated value of the f1 score is: [mT]', f1 * 1e3)
         show(self.problem, computation, field="magnetic", variable="magnetic_potential_real", component="scalar")
 
+        """
+        List of keys for vizualizing the other magnetic quantities:
+        https: // github.com / artap - framework / agrossuite / blob / master / resources / xslt / problem_a2d_21_xml.xsl
+        magnetic_energy_density
+        magnetic_permeability
+        magnetic_potential_real
+        magnetic_potential_imag
+        magnetic_current_density_external_imag
+        """
+
         return f1
 
 
 if __name__ == '__main__':
     x_1 = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5]
 
-    current_density_2 = [3.5 for i in range(20)]
+    current_density_2 = [3.0 for i in range(20)]
 
     x_2 = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 7.5, 8.5, 6.5, 10.5, 12.5, 13.5]
 
