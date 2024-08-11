@@ -1,6 +1,3 @@
-from math import inf
-from operator import itemgetter
-
 from artap.algorithm_genetic import NSGAII
 from artap.problem import Problem
 from artap.individual import Individual
@@ -16,9 +13,9 @@ global x_base  # this will be the examined layout
 CURRENT_BASE = 3.0
 
 
-class F2Estimation(Problem):
+class F2EstimationSymmetric(Problem):
     def set(self):
-        self.name = """ The goal of this calculation to estimate the error in a single case with different doe metrics. """
+        self.name = """ Calculation of the different errors considering symmetrical errors during the calculations. """
 
         self.parameters = [
             {"name": "x0", "bounds": [-0.5, 0.5]},
@@ -32,16 +29,7 @@ class F2Estimation(Problem):
             {"name": "x8", "bounds": [-0.5, 0.5]},
             {"name": "x9", "bounds": [-0.5, 0.5]},
             {"name": "x10", "bounds": [-0.5, 0.5]},
-            {"name": "x11", "bounds": [-0.5, 0.5]},
-            {"name": "x12", "bounds": [-0.5, 0.5]},
-            {"name": "x13", "bounds": [-0.5, 0.5]},
-            {"name": "x14", "bounds": [-0.5, 0.5]},
-            {"name": "x15", "bounds": [-0.5, 0.5]},
-            {"name": "x16", "bounds": [-0.5, 0.5]},
-            {"name": "x17", "bounds": [-0.5, 0.5]},
-            {"name": "x18", "bounds": [-0.5, 0.5]},
-            {"name": "x19", "bounds": [-0.5, 0.5]},
-            #{"name": "current", "bounds": [-0.05, 0.05]},
+            {"name": "current", "bounds": [-0.15, 0.15]},
         ]
 
         self.costs = [{"name": "f_1", "criteria": "minimize"}]
@@ -49,9 +37,13 @@ class F2Estimation(Problem):
     def evaluate(self, individual):
         x = individual.vector
 
-        radii_vector = [x_base[i] + x[i] for i in range(20)]
-        #c_dens = 3.0 + x[20]
-        c_dens = 3.0
+        radii_vector = [x_base[i] + x[i] for i in range(10)]
+        reversed = copy(radii_vector)
+        reversed.reverse()
+        radii_vector = radii_vector + reversed
+        print(len(radii_vector),radii_vector)
+        # current density
+        c_dens = 3.0 + x[10]
         print("current density:", c_dens)
         current_density = 20*[c_dens]
         print("radii_vector: ", radii_vector)
@@ -69,10 +61,10 @@ if __name__ == "__main__":
     f1 = simulation.fem_simulation()
     print("original f1: ", f1)
 
-    problem = F2Estimation()
+    problem = F2EstimationSymmetric()
     algorithm = NSGAII(problem)
-    algorithm.options["max_population_number"] = 50
-    algorithm.options["max_population_size"] = 50
+    algorithm.options["max_population_number"] = 30
+    algorithm.options["max_population_size"] = 30
     algorithm.options['max_processes'] = 1
     algorithm.run()
 
