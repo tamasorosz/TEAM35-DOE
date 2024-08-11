@@ -1,9 +1,10 @@
+scikit-learn
 agrossuite===2020.9.15.64726
 scipy
-scikit-learn
 vtk
 matplotlib
 opencv-python
 typer
 marshmallow-dataclass
 dataclasses-json
+artap === 2020.8.28.1452

@@ -38,6 +38,8 @@ RUN apt-get update && \
     apt-get install -y python${PYTHON_VERSION} python3-pip python3-matplotlib && \
     rm -rf /var/lib/apt/lists/*
 
+ENV SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL=True
+
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
@@ -46,4 +48,6 @@ COPY src /app
 
 VOLUME ["/app/output"]
 
-ENTRYPOINT ["python3.8", "team35_agros.py"]
+#ENTRYPOINT ["python3.8", "team35_agros.py"]
+
+ENTRYPOINT ["python3.8", "error_estimation.py"]

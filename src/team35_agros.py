@@ -105,7 +105,7 @@ class FemModel:
 
         return x0 + width / 2.0, y0 + height / 2.0  # gives back the center of the rectangle in [m]-s
 
-    def fem_simulation(self):
+    def fem_simulation(self, with_plot=False):
         # simulation = FemModel()
         self.create_rectangle(0.0, WINDOW_MIN, WINDOW_W, WINDOW_H, {"magnetic": "A = 0"})
         self.geo.add_label(1e-3, (WINDOW_MIN + 1.0) * 1e-3, materials={"magnetic": "Air"})
@@ -152,9 +152,11 @@ class FemModel:
                 b_values.append(point["Br"])
 
         f1 = f1_score(b_values, b_0=B_0)
-        print('Magnetic Energy', solution.volume_integrals())
-        print('The calculated value of the f1 score is: [mT]', f1 * 1e3)
-        show(self.problem, computation, field="magnetic", variable="magnetic_potential_real", component="scalar")
+
+        if with_plot:
+            print('Magnetic Energy', solution.volume_integrals())
+            print('The calculated value of the f1 score is: [mT]', f1 * 1e3)
+            show(self.problem, computation, field="magnetic", variable="magnetic_potential_real", component="scalar")
 
         """
         List of keys for vizualizing the other magnetic quantities:
