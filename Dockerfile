@@ -49,5 +49,6 @@ COPY src /app
 VOLUME ["/app/output"]
 
 #ENTRYPOINT ["python3.8", "team35_agros.py"]
-ENTRYPOINT ["python3.8", "error_estimation.py"]
+#ENTRYPOINT ["python3.8", "error_estimation.py"]
 #ENTRYPOINT ["python3.8", "error_estimation_symmetric.py"]
+ENTRYPOINT ["python3.8", "doe_error_estimations.py"]

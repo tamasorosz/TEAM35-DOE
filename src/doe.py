@@ -239,6 +239,6 @@ if __name__ == "__main__":
     #print(len(doe_pbdesign(10)))
     #print(*doe_bbdesign(3), sep='\n')
     print(len(doe_pbdesign(10)))
-    print(doe_pbdesign())
+    print(doe_pbdesign(10))
     print(len(doe_bbdesign(10)))
     print(len(doe_ccf(10)), sep='\n')

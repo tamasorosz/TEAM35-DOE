@@ -41,7 +41,7 @@ class F2Estimation(Problem):
             {"name": "x17", "bounds": [-0.5, 0.5]},
             {"name": "x18", "bounds": [-0.5, 0.5]},
             {"name": "x19", "bounds": [-0.5, 0.5]},
-            #{"name": "current", "bounds": [-0.05, 0.05]},
+            {"name": "current", "bounds": [-0.05, 0.05]},
         ]
 
         self.costs = [{"name": "f_1", "criteria": "minimize"}]
@@ -50,8 +50,8 @@ class F2Estimation(Problem):
         x = individual.vector
 
         radii_vector = [x_base[i] + x[i] for i in range(20)]
-        #c_dens = 3.0 + x[20]
-        c_dens = 3.0
+        c_dens = 3.0 + x[20]
+        #c_dens = 3.0
         print("current density:", c_dens)
         current_density = 20*[c_dens]
         print("radii_vector: ", radii_vector)
@@ -71,8 +71,8 @@ if __name__ == "__main__":
 
     problem = F2Estimation()
     algorithm = NSGAII(problem)
-    algorithm.options["max_population_number"] = 50
-    algorithm.options["max_population_size"] = 50
+    algorithm.options["max_population_number"] = 60
+    algorithm.options["max_population_size"] = 60
     algorithm.options['max_processes'] = 1
     algorithm.run()
 

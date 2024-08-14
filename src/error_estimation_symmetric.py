@@ -28,8 +28,7 @@ class F2EstimationSymmetric(Problem):
             {"name": "x7", "bounds": [-0.5, 0.5]},
             {"name": "x8", "bounds": [-0.5, 0.5]},
             {"name": "x9", "bounds": [-0.5, 0.5]},
-            {"name": "x10", "bounds": [-0.5, 0.5]},
-            {"name": "current", "bounds": [-0.15, 0.15]},
+            {"name": "current", "bounds": [-0.05, 0.05]},
         ]
 
         self.costs = [{"name": "f_1", "criteria": "minimize"}]
