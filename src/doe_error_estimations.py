@@ -3,8 +3,10 @@ from copy import copy
 from team35_agros import FemModel
 from doe_metrics import calc_doe_meausere, DoEType
 
+B_00 = 2.0 * 1e-3  # 2 mT
 
-def error_estimation(x_base: list, c_base: list, doe_method=DoEType.PB, is_current = True, is_full=True):
+
+def error_estimation(x_base: list, c_base: list, doe_method=DoEType.PB, is_current=True, is_optimization=False):
     print("Calculation starts")
 
     # Create the radii vector by mirroring x_base
@@ -29,7 +31,8 @@ def error_estimation(x_base: list, c_base: list, doe_method=DoEType.PB, is_curre
     f1_max = 0.0
     max_vector = []
     for index, x_values in enumerate(x_list):
-        print(f"Round: {index + 1} of {len(x_list)}")
+        if not is_optimization:
+            print(f"Round: {index + 1} of {len(x_list)}")
 
         # Create a radii vector by mirroring the first 10 x_values
         radii_vector = x_values[:10] + x_values[:10][::-1]
@@ -46,13 +49,14 @@ def error_estimation(x_base: list, c_base: list, doe_method=DoEType.PB, is_curre
 
         # Update the maximum error
         error = abs(f1 - f1_00)
-        print(f"f1: {f1}, error: {error}, radii_vector: {radii_vector}, current density: {current_density[0]}")
+        if not is_optimization:
+            print(f"f1: {f1}, error: {error}, radii_vector: {radii_vector}, current density: {current_density[0]}")
 
         if f1_max < error:
             f1_max = error
             max_vector = copy(radii_vector)
 
-    if is_full:
+    if not is_optimization:
         # Calculate and print error percentage
         error_percentage = (f1_max / f1_00) * 100.0
         print(f"Error estimate: {error_percentage:.2f}%, absolute: {f1_max}")
@@ -61,6 +65,9 @@ def error_estimation(x_base: list, c_base: list, doe_method=DoEType.PB, is_curre
         simulation = FemModel(radiis=max_vector, current_density=c_base)
         f1_00 = simulation.fem_simulation(with_plot=True)
         print("worst case calculation: ", f1_00)
+    else:
+        # print(f1_00, (f1_max / f1_00) * 100.0)
+        return f1_00/B_00*100.0, (f1_max / f1_00) * 100.0
 
 
 if __name__ == '__main__':
