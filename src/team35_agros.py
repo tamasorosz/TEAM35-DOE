@@ -45,7 +45,7 @@ class FemModel:
         self.magnetic.analysis_type = "steadystate"
         self.magnetic.number_of_refinements = 1
         self.magnetic.polynomial_order = 2
-        self.magnetic.adaptivity_type = "disabled"
+        self.magnetic.adaptivity_type = "h-adaptivity"
         self.magnetic.solver = "linear"
 
         # boundaries

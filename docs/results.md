@@ -43,12 +43,79 @@ Single error estimate with doe methods:
 # Plackett Burman design
 
 ## considering the current density during the error calculation
+Number of evaluations: 12
+Error estimate: 15.05%, absolute: 0.00022991972640085514
+team35-doe-app-1: Solution vector: [13.0, 12.0, 11.0, 6.0, 9.0, 8.0, 7.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 8.0, 9.0, 6.0, 11.0, 12.0, 13.0]
+team35-doe-app-1: Magnetic Energy {'Flx': 0.005117595799626078, 'Fly': -2.005080592093934e-05, 'Ftx': 2.400062146244979e-05, 'Fty': 8.014495747392597e-05, 'Ier': 90.0000000000001, 'Iivr': 0.0, 'Ir': 90.0000000000001, 'Pj': 0.0, 'S': 0.002000000000000003, 'Tl': 0.0, 'Tt': 0.0, 'V': 0.0002513274122871832, 'Wm': 2.4327935296140025e-05}
+team35-doe-app-1: The calculated value of the f1 score is: [mT] 1.6957247114404308
+team35-doe-app-1: xx2x_hnk.vtk
+team35-doe-app-1: worst case calculation:  0.0016957247114404309
 
-Number of evaluations: 24
-radii_vector:  [14.0, 13.0, 11.0, 7.0, 9.0, 8.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 9.0, 7.0, 11.0, 13.0, 14.0]
-team35-doe-app-1: Error estimate:  18.97422135836787 [%], absolute: 0.0002898123349385764
 
-Box Behnken
-Number of evaluations: 232
-adii_vector:  [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 7.5, 8.5, 6.5, 10.5, 12.5, 13.5]
-team35-doe-app-1: Error estimate:  17.138229201138007 [%], absolute: 0.00026176938319020116
+without currents:
+Number of evaluations: 2
+f1: 0.001598037709297204, error: 7.063731240046023e-05, radii_vector: [14.0, 13.0, 11.0, 7.0, 9.0, 8.0, 7.0, 7.0, 7.0, 6.55, 6.55, 7.0, 7.0, 7.0, 8.0, 9.0, 7.0, 11.0, 13.0, 14.0], current density: 3.0
+team35-doe-app-1: Error estimate: 11.18%, absolute: 0.0001706896980214088
+team35-doe-app-1: Solution vector: [13.0, 12.0, 11.0, 6.0, 9.0, 8.0, 7.0, 6.0, 6.0, 6.45, 6.45, 6.0, 6.0, 7.0, 8.0, 9.0, 6.0, 11.0, 12.0, 13.0]
+team35-doe-app-1: Magnetic Energy {'Flx': 0.005146596714014992, 'Fly': -2.0201508268269458e-05, 'Ftx': 2.447894031689848e-05, 'Fty': 8.082619868580244e-05, 'Ier': 90.00000000000045, 'Iivr': 0.0, 'Ir': 90.00000000000045, 'Pj': 0.0, 'S': 0.002000000000000001, 'Tl': 0.0, 'Tt': 0.0, 'V': 0.0002513274122871832, 'Wm': 2.461657422579568e-05}
+team35-doe-app-1: The calculated value of the f1 score is: [mT] 1.698090094918108
+team35-doe-app-1: loacphnr.vtk
+team35-doe-app-1: worst case calculation:  0.0016980900949181079
+
+f1: 0.001598037709297204, error: 7.063731240046023e-05, radii_vector: [14.0, 13.0, 11.0, 7.0, 9.0, 8.0, 7.0, 7.0, 7.0, 6.55, 6.55, 7.0, 7.0, 7.0, 8.0, 9.0, 7.0, 11.0, 13.0, 14.0], current density: 3.0
+team35-doe-app-1: Error estimate: 11.18%, absolute: 0.0001706896980214088
+team35-doe-app-1: Solution vector: [13.0, 12.0, 11.0, 6.0, 9.0, 8.0, 7.0, 6.0, 6.0, 6.45, 6.45, 6.0, 6.0, 7.0, 8.0, 9.0, 6.0, 11.0, 12.0, 13.0]
+team35-doe-app-1: Magnetic Energy {'Flx': 0.005146596714014992, 'Fly': -2.0201508268269458e-05, 'Ftx': 2.447894031689848e-05, 'Fty': 8.082619868580244e-05, 'Ier': 90.00000000000045, 'Iivr': 0.0, 'Ir': 90.00000000000045, 'Pj': 0.0, 'S': 0.002000000000000001, 'Tl': 0.0, 'Tt': 0.0, 'V': 0.0002513274122871832, 'Wm': 2.461657422579568e-05}
+team35-doe-app-1: The calculated value of the f1 score is: [mT] 1.698090094918108
+
+
+# MinMax calculation
+Number of evaluations: 4
+Error estimate: 8.06%, absolute: 0.0001231812951936859
+team35-doe-app-1: Solution vector: [14.0, 13.0, 11.0, 7.0, 9.0, 8.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 7.0, 8.0, 9.0, 7.0, 11.0, 13.0, 14.0]
+team35-doe-app-1: Magnetic Energy {'Flx': 0.0053866734601563365, 'Fly': -2.32883149806775e-05, 'Ftx': 3.10027870973264e-05, 'Fty': 9.353490702613023e-05, 'Ier': 90.0000000000002, 'Iivr': 0.0, 'Ir': 90.0000000000002, 'Pj': 0.0, 'S': 0.001999999999999995, 'Tl': 0.0, 'Tt': 0.0, 'V': 0.00025132741228718353, 'Wm': 2.748350735353336e-05}
+team35-doe-app-1: The calculated value of the f1 score is: [mT] 1.461917730545458
+team35-doe-app-1: pquthb8s.vtk
+team35-doe-app-1: worst case calculation:  0.001461917730545458
+
+without current:
+f1: 0.0016126720351179484, error: 8.527163822120466e-05, radii_vector: [13.0, 12.0, 10.0, 6.0, 8.0, 7.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 8.0, 6.0, 10.0, 12.0, 13.0], current density: 3.0
+team35-doe-app-1: Error estimate: 5.58%, absolute: 8.527163822120466e-05
+team35-doe-app-1: Solution vector: [13.0, 12.0, 10.0, 6.0, 8.0, 7.0, 6.0, 6.0, 6.0, 6.0, 6.0, 6.0, 7.0, 8.0, 6.0, 10.0, 12.0, 13.0]
+team35-doe-app-1: Magnetic Energy {'Flx': 0.004440967891430972, 'Fly': -1.0796499078561921e-05, 'Ftx': 1.9935969369533758e-05, 'Fty': 4.273178423295471e-05, 'Ier': 81.00000000000006, 'Iivr': 0.0, 'Ir': 81.00000000000006, 'Pj': 0.0, 'S': 0.0020000000000000118, 'Tl': 0.0, 'Tt': 0.0, 'V': 0.00025132741228718424, 'Wm': 2.049165120541588e-05}
+team35-doe-app-1: The calculated value of the f1 score is: [mT] 1.6126720351181254
+team35-doe-app-1: qbkxr1zz.vtk
+team35-doe-app-1: worst case calculation:  0.0016126720351181253
+
+# Central Composite Design
+Number of evaluations: 2071
+
+Error estimate: 22.99%, absolute: 0.00035107752577911164
+team35-doe-app-1: Solution vector: [14.0, 13.0, 11.0, 7.0, 9.0, 8.0, 7.0, 7.0, 7.0, 6.0, 6.0, 7.0, 7.0, 7.0, 8.0, 9.0, 7.0, 11.0, 13.0, 14.0]
+team35-doe-app-1: Magnetic Energy {'Flx': 0.005300853072667136, 'Fly': -2.2918698140094028e-05, 'Ftx': 2.9886157074404923e-05, 'Fty': 9.142028194542052e-05, 'Ier': 90.00000000000036, 'Iivr': 0.0, 'Ir': 90.00000000000036, 'Pj': 0.0, 'S': 0.0019999999999999966, 'Tl': 0.0, 'Tt': 0.0, 'V': 0.0002513274122871821, 'Wm': 2.665640616584822e-05}
+team35-doe-app-1: The calculated value of the f1 score is: [mT] 1.814896317385903
+
+# Box Behnken Design
+team35-doe-app-1: Error estimate: 17.14%, absolute: 0.00026176936775015565
+team35-doe-app-1: Solution vector: [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.0, 6.0, 6.5, 6.5, 6.5, 7.5, 8.5, 6.5, 10.5, 12.5, 13.5]
+team35-doe-app-1: Magnetic Energy {'Flx': 0.005159616915064461, 'Fly': -2.030692309741904e-05, 'Ftx': 2.4482133377677305e-05, 'Fty': 8.09439545389715e-05, 'Ier': 90.00000000000038, 'Iivr': 0.0, 'Ir': 90.00000000000038, 'Pj': 0.0, 'S': 0.0019999999999999944, 'Tl': 0.0, 'Tt': 0.0, 'V': 0.0002513274122871842, 'Wm': 2.4465684724721195e-05}
+team35-doe-app-1: The calculated value of the f1 score is: [mT] 1.7270522275216067
+
+without currents:
+Nr of evaluations: 190
+Error estimate: 10.16%, absolute: 0.0001551309013275077
+team35-doe-app-1: Solution vector: [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.0, 6.0, 6.5, 6.5, 6.0, 6.0, 6.5, 7.5, 8.5, 6.5, 10.5, 12.5, 13.5]
+team35-doe-app-1: Magnetic Energy {'Flx': 0.005118210085127015, 'Fly': -2.0114955450416946e-05, 'Ftx': 2.3990489701773444e-05, 'Fty': 8.01524712238325e-05, 'Ier': 90.00000000000033, 'Iivr': 0.0, 'Ir': 90.00000000000033, 'Pj': 0.0, 'S': 0.001999999999999999, 'Tl': 0.0, 'Tt': 0.0, 'V': 0.0002513274122871836, 'Wm': 2.4081345277586926e-05}
+team35-doe-app-1: The calculated value of the f1 score is: [mT] 1.6825312982245888
+team35-doe-app-1: iud8ub7_.vtk
+team35-doe-app-1: worst case calculation:  0.0016825312982245888
+
+Without currents
+Number of evaluations: 1045
+Error estimate: 13.32%, absolute: 0.00020346029446501653
+team35-doe-app-1: Solution vector: [14.0, 13.0, 11.0, 7.0, 9.0, 8.0, 7.0, 6.0, 6.0, 6.55, 6.55, 6.0, 6.0, 7.0, 8.0, 9.0, 7.0, 11.0, 13.0, 14.0]
+team35-doe-app-1: Magnetic Energy {'Flx': 0.00519523704850014, 'Fly': -2.2328672052731293e-05, 'Ftx': 2.831011139207507e-05, 'Fty': 8.910321210957341e-05, 'Ier': 90.00000000000009, 'Iivr': 0.0, 'Ir': 90.00000000000009, 'Pj': 0.0, 'S': 0.0019999999999999883, 'Tl': 0.0, 'Tt': 0.0, 'V': 0.000251327412287184, 'Wm': 2.557719762811369e-05}
+team35-doe-app-1: The calculated value of the f1 score is: [mT] 1.7308606913619424
+team35-doe-app-1: q7a4g_xl.vtk
+team35-doe-app-1: worst case calculation:  0.0017308606913619424
+

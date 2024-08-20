@@ -1,44 +1,71 @@
-from team35_agros import FemModel
 from copy import copy
+
+from team35_agros import FemModel
 from doe_metrics import calc_doe_meausere, DoEType
 
 
-def error_estimation(x_base: list, c_base: list):
-    # calculates the base scenario
-    simulation = FemModel(radiis=x_base, current_density=c_base)
+def error_estimation(x_base: list, c_base: list, doe_method=DoEType.PB, is_current = True, is_full=True):
+    print("Calculation starts")
+
+    # Create the radii vector by mirroring x_base
+    reversed_x_base = x_base[::-1]
+    radii_vector = x_base + reversed_x_base
+
+    # Perform the initial simulation
+    simulation = FemModel(radiis=radii_vector, current_density=c_base)
     f1_00 = simulation.fem_simulation()
-    print("original f1: ", f1_00)
+    print("Original f1:", f1_00)
 
-    # calculates a list of list with the doe position errors
-    x = x_base + [c_base[0]]
-    x_list = calc_doe_meausere(x, doe_type=DoEType.CCF, delta_pos=0.5, delta_curr=0.05)
-    print("Number of evaluations: ", len(x_list))
+    # Generate DOE (Design of Experiments) positions
+    if is_current:
+        x = x_base[:10] + [c_base[0]]
+    else:
+        x = x_base[:10]
+
+    x_list = calc_doe_meausere(x, doe_type=doe_method, delta_pos=0.5, delta_curr=0.05, is_curr=is_current)
+    print("Number of evaluations:", len(x_list))
+
+    # Calculate maximum error
     f1_max = 0.0
-    for x_values in x_list:
-        radii_vector = [x_values[i] for i in range(10)]
-        reversed = copy(radii_vector)
-        reversed.reverse()
+    max_vector = []
+    for index, x_values in enumerate(x_list):
+        print(f"Round: {index + 1} of {len(x_list)}")
 
-        radii_vector = radii_vector + reversed
-        print(len(radii_vector), radii_vector)
-        # current density
-        c_dens = x_values[-1]
-        print("current density:", c_dens)
-        current_density = 20 * [c_dens]
-        print("radii_vector: ", radii_vector)
+        # Create a radii vector by mirroring the first 10 x_values
+        radii_vector = x_values[:10] + x_values[:10][::-1]
 
+        # Use the last x_value as current density
+        if is_current:
+            current_density = [x_values[-1]] * 20
+        else:
+            current_density = c_base
+
+        # Perform the simulation
         simulation = FemModel(radiis=radii_vector, current_density=current_density)
         f1 = simulation.fem_simulation()
-        error = f1 - f1_00
-        f1_max = max(f1_max, error)
 
-    error_percentage = f1_max / f1_00 * 100.0
-    print("Error estimate: ", error_percentage, "[%], absolute:", f1_max)
+        # Update the maximum error
+        error = abs(f1 - f1_00)
+        print(f"f1: {f1}, error: {error}, radii_vector: {radii_vector}, current density: {current_density[0]}")
+
+        if f1_max < error:
+            f1_max = error
+            max_vector = copy(radii_vector)
+
+    if is_full:
+        # Calculate and print error percentage
+        error_percentage = (f1_max / f1_00) * 100.0
+        print(f"Error estimate: {error_percentage:.2f}%, absolute: {f1_max}")
+        print(f"Solution vector: {max_vector}")
+
+        simulation = FemModel(radiis=max_vector, current_density=c_base)
+        f1_00 = simulation.fem_simulation(with_plot=True)
+        print("worst case calculation: ", f1_00)
 
 
 if __name__ == '__main__':
     print("Calculating the f1 metric in the base layout")
-    x_base = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 7.5, 8.5, 6.5, 10.5, 12.5, 13.5]
+    x_base = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5]
     c_base = 20 * [3.0]
 
-    error_estimation(x_base, c_base)
+    error_estimation(x_base, c_base, doe_method=DoEType.MINMAX, is_current=True)
