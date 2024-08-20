@@ -28,7 +28,7 @@ class F2EstimationSymmetric(Problem):
             {"name": "x7", "bounds": [-0.5, 0.5]},
             {"name": "x8", "bounds": [-0.5, 0.5]},
             {"name": "x9", "bounds": [-0.5, 0.5]},
-            #{"name": "current", "bounds": [-0.05, 0.05]},
+            {"name": "current", "bounds": [-0.05, 0.05]},
         ]
 
         self.costs = [{"name": "f_1", "criteria": "minimize"}]
@@ -42,7 +42,7 @@ class F2EstimationSymmetric(Problem):
         radii_vector = radii_vector + reversed
         print(len(radii_vector),radii_vector)
         # current density
-        c_dens = 3.0 #+ x[10]
+        c_dens = 3.0 + x[10]
         print("current density:", c_dens)
         current_density = 20*[c_dens]
         print("radii_vector: ", radii_vector)
@@ -62,8 +62,8 @@ if __name__ == "__main__":
 
     problem = F2EstimationSymmetric()
     algorithm = NSGAII(problem)
-    algorithm.options["max_population_number"] = 10
-    algorithm.options["max_population_size"] = 10
+    algorithm.options["max_population_number"] = 30
+    algorithm.options["max_population_size"] = 30
     algorithm.options['max_processes'] = 1
     algorithm.run()
 

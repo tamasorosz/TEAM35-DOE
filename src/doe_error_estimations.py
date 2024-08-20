@@ -68,4 +68,4 @@ if __name__ == '__main__':
     x_base = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5]
     c_base = 20 * [3.0]
 
-    error_estimation(x_base, c_base, doe_method=DoEType.MINMAX, is_current=True)
+    error_estimation(x_base, c_base, doe_method=DoEType.SOBOL, is_current=True)

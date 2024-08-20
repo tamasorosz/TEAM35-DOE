@@ -10,6 +10,7 @@ class DoEType(Enum):
     CCF = 2
     BB = 3
     MINMAX = 4
+    SOBOL = 5
 
 
 def calc_min_max(x: list, delta_pos=0.5, delta_curr=0.05, is_curr=True):
@@ -66,6 +67,8 @@ def calc_doe_meausere(x: list, doe_type: DoEType, delta_pos=0.5, delta_curr=0.05
 
     elif doe_type == DoEType.MINMAX:
         return calc_min_max(x=x, delta_pos=delta_pos, delta_curr=delta_curr, is_curr=is_curr)
+    elif doe_type == DoEType.SOBOL:
+        doe_lists = qmc_factors(dimension=n)
 
     result_list = []
     print("length of the doe list:", len(doe_lists))
