@@ -12,8 +12,6 @@ class DoEType(Enum):
     MINMAX = 4
 
 
-# sdef calc_min_max_wo
-
 def calc_min_max(x: list, delta_pos=0.5, delta_curr=0.05, is_curr=True):
     """
 
@@ -46,10 +44,11 @@ def calc_min_max(x: list, delta_pos=0.5, delta_curr=0.05, is_curr=True):
 
     return [x_pp, x_pn, x_np, x_nn]
 
-def qmc_factors():
+def qmc_factors(dimension:int=11):
     """Similar function like the doe metric provides, but not a 0,1 metrics"""
-    sampler = Sobol(d=2, scramble=False)
-
+    sampler = Sobol(d=dimension, scramble=False)
+    sample = sampler.random_base2(m=5) # 32 samples from the region
+    return sample.tolist()
 
 def calc_doe_meausere(x: list, doe_type: DoEType, delta_pos=0.5, delta_curr=0.05, is_curr=False):
     n = len(x)
@@ -92,3 +91,4 @@ if __name__ == '__main__':
     assert res == [[0.5, 1.5, 3.0], [0.5, 2.5, 3.0], [1.5, 1.5, 3.0], [1.5, 2.5, 3.0], [0.5, 2.0, 2.95],
                    [0.5, 2.0, 3.05], [1.5, 2.0, 2.95], [1.5, 2.0, 3.05], [1.0, 1.5, 2.95], [1.0, 1.5, 3.05],
                    [1.0, 2.5, 2.95], [1.0, 2.5, 3.05], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0], [1.0, 2.0, 3.0]]
+

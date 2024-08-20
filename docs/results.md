@@ -119,3 +119,10 @@ team35-doe-app-1: The calculated value of the f1 score is: [mT] 1.73086069136194
 team35-doe-app-1: q7a4g_xl.vtk
 team35-doe-app-1: worst case calculation:  0.0017308606913619424
 
+
+
+SMALL-SCALE GENETIC ALGORIThM based approach:
+with currents, has a worse approach than the Plackett-Burmann design
+maximal value of the f1: [-0.001724170309469086]
+team35-doe-app-1: combination of errors: [0.1464241518975478, -0.325599352196, -0.055893795091985055, 0.48654958616786576, 0.40152333623888214, 0.3740529467962281, -0.28134117369, -0.48889856958646194, -0.2661668036218353, 0.0067546305535838725, 0.04960355774106078]
+team35-doe-app-1: deviation from f1 [%]: 13.0
