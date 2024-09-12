@@ -21,10 +21,17 @@ def calc_min_max(x: list, delta_pos=0.5, delta_curr=0.05, is_curr=True):
     :param delta_curr: current setting error
     :return: list of vectors, which should be resolved to calculate the
     """
-    x_p = [x[i] + delta_pos for i in range(len(x) - 1)]
-    x_n = [x[i] - delta_pos for i in range(len(x) - 1)]
+
+    last_index = 0
+    if is_curr:
+        last_index = 1
+
+    x_p = [x[i] + delta_pos for i in range(len(x) - last_index)]
+    x_n = [x[i] - delta_pos for i in range(len(x) - last_index)]
 
     if not is_curr:
+        print("is current is false")
+        print("len", len(x_p))
         return [x_p, x_n]
 
     # 1

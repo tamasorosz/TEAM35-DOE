@@ -1,6 +1,7 @@
 from agrossuite import agros
 from vtk_tools import show
 from metrics import f1_score
+import ctypes
 
 """
 The role of this module is to create a FEM model for the TEAM 35 benchmark problem from a given turn radius list,
@@ -45,7 +46,7 @@ class FemModel:
         self.magnetic.analysis_type = "steadystate"
         self.magnetic.number_of_refinements = 1
         self.magnetic.polynomial_order = 2
-        self.magnetic.adaptivity_type = "h-adaptivity"
+        self.magnetic.adaptivity_type = "disabled"
         self.magnetic.solver = "linear"
 
         # boundaries
@@ -169,6 +170,26 @@ class FemModel:
         """
 
         return f1
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.cleanup()
+
+    def cleanup(self):
+        """Release resources and perform cleanup."""
+        if self.problem is not None:
+            # Apply explicit deallocation logic if required
+            self.problem = None
+        if self.geo is not None:
+            self.geo = None
+        if self.magnetic is not None:
+            self.magnetic = None
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+
+    def __del__(self):
+        self.cleanup()
 
 
 if __name__ == '__main__':

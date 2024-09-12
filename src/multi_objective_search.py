@@ -26,25 +26,16 @@ class F2EstimationSymmetric(Problem):
             {"name": "x6", "bounds": [5.05, 30.0]},
             {"name": "x7", "bounds": [5.05, 30.0]},
             {"name": "x8", "bounds": [5.05, 30.0]},
-            {"name": "x9", "bounds": [5.05, 30.0]},
-            {"name": "current", "bounds": [2.95, 3.05]},
+            {"name": "x9", "bounds": [5.05, 30.0]}
         ]
 
         self.costs = [{"name": "f_1", "criteria": "minimize"}, {"name": "f_2", "criteria": "minimize"}]
 
     def evaluate(self, individual):
         x = individual.vector
+        c_base = 20 * [3.0]
 
-        # The examined case
-        #x_base = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5]
-        #c_base = [3.0]
-
-        #x_base = [x_base[i] + x[i] for i in range(10)] # positional errors
-        #c_base = 20 * [c_base[0] + x[10]] # currents
-
-        x_base = x[:10]
-        c_base = 20 * [x[10]]
-        f1, f2 = error_estimation(x_base, c_base, doe_method=DoEType.MINMAX, is_current=True, is_optimization=True)
+        f1, f2 = error_estimation(x, c_base, doe_method=DoEType.MINMAX, is_optimization=True, is_current=DoEType.PB)
 
         return [f1, f2]
 
@@ -52,9 +43,9 @@ class F2EstimationSymmetric(Problem):
 if __name__ == "__main__":
     problem = F2EstimationSymmetric()
     algorithm = NSGAII(problem)
-    algorithm.options["max_population_number"] = 40
-    algorithm.options["max_population_size"] = 40
-    algorithm.options['max_processes'] = 1
+    algorithm.options["max_population_number"] = 30
+    algorithm.options["max_population_size"] = 30
+
     algorithm.run()
 
     results = Results(problem)

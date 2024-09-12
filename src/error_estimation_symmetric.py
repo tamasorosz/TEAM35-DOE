@@ -11,6 +11,7 @@ from doe import doe_ccf, doe_pbdesign, doe_bbdesign
 
 global x_base  # this will be the examined layout
 CURRENT_BASE = 3.0
+B_00 = 2.0 * 1e-3  # 2 mT
 
 
 class F2EstimationSymmetric(Problem):
@@ -53,7 +54,10 @@ class F2EstimationSymmetric(Problem):
 
 if __name__ == "__main__":
     print("Calculating the f1 metric in the base layout")
-    x_base = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 7.5, 8.5, 6.5, 10.5, 12.5, 13.5]
+    #x_base = [13.5, 12.5, 10.5, 6.5, 8.5, 7.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 6.5, 7.5, 8.5, 6.5, 10.5, 12.5, 13.5]
+    x_iii = [25.48, 15.55, 12.52, 23.31, 5.55, 14.67, 12.38, 17.81, 22.18, 17.18]
+    reversed_x_base = x_iii[::-1]
+    x_base = x_iii + reversed_x_base
     c_base = 20 * [3.0]
     # calculates the base scenario
     simulation = FemModel(radiis=x_base, current_density=c_base)
@@ -71,4 +75,4 @@ if __name__ == "__main__":
     optimum = results.find_optimum(name="f_1")
     print("maximal value of the f1:", optimum.costs)
     print("combination of errors:", optimum.vector)
-    print("deviation from f1 [%]:", round(abs(f1 + optimum.costs[0]) / f1 * 100))
+    print("f2 [%]:", round(abs(f1 + optimum.costs[0]) / B_00 * 100), "f1 [%]:", f1/ B_00 * 100)
